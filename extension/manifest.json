@@ -1,0 +1,13 @@
+{
+    "manifest_version": 3,
+    "name":"Linked in extension",
+    "version": "1.0",
+    "description": "Adds a button to a linked-in profile page",
+    "content_scripts": [
+        {
+            "matches": ["https://*.linkedin.com/in/*"],
+            "js":["content.js"],
+            "css":["style.css"]
+        }
+    ]
+}
