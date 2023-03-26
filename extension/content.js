@@ -37,8 +37,6 @@ function loadButton() {
   } else {
     myTimeout = setTimeout(loadButton, 500);
   }
-
-  console.log(parentElement);
 }
 
 function getButton() {
@@ -84,38 +82,45 @@ function showSnackBar() {
   }, 2500);
 }
 
-function getUserName(vanityName) {
-  const accessToken =
-    'AQVSes_h2vKQPgUbDExmRAQxA6MYFbVMIUfx0VYkDgV8SPYnDiNgOLzKcG6rUJOfSKIDyyqc67hdWmS9icL1NlD7ju3_01WsUtSyamsSSobWEd8FAtMeeJWKOq7CHKdOjdHWRm7EGD90GaSrmG-P8Wg2pdlPqYJzGJ-6eDOur3qt-UdTtPOiLBk8_RUNfp5zVPJU8Uv47Ms84fx61fi02Rh12Jm62o1wexJxWgQVrQWvScWeq1HJ9pBp85JAl6gjQa3dNoNTx9lAaUxiDogscUFFVqlbN26yChVZAgdPsanOhH7oZdf5maTNtvgkEyig5uER7RzqJd9C4azHB1v1LpEO91jaEA';
+// function getUserName(vanityName) {
+//   const accessToken =
+//     'AQVSes_h2vKQPgUbDExmRAQxA6MYFbVMIUfx0VYkDgV8SPYnDiNgOLzKcG6rUJOfSKIDyyqc67hdWmS9icL1NlD7ju3_01WsUtSyamsSSobWEd8FAtMeeJWKOq7CHKdOjdHWRm7EGD90GaSrmG-P8Wg2pdlPqYJzGJ-6eDOur3qt-UdTtPOiLBk8_RUNfp5zVPJU8Uv47Ms84fx61fi02Rh12Jm62o1wexJxWgQVrQWvScWeq1HJ9pBp85JAl6gjQa3dNoNTx9lAaUxiDogscUFFVqlbN26yChVZAgdPsanOhH7oZdf5maTNtvgkEyig5uER7RzqJd9C4azHB1v1LpEO91jaEA';
 
-  // Construct the API request URL with the appropriate query parameters
-  const apiUrl = `https://api.linkedin.com/v2/search?q=vanityName:${vanityName}&facetNetwork=%5B%22F%22%5D&facetConnectionOf=%5B%22viewer%22%5D&origin=OTHER&count=1&projection=(id,firstName,lastName,profilePicture(displayImage~:playableStreams))`;
+//   // Construct the API request URL with the appropriate query parameters
+//   const apiUrl = `https://api.linkedin.com/v2/search?q=vanityName:${vanityName}&facetNetwork=%5B%22F%22%5D&facetConnectionOf=%5B%22viewer%22%5D&origin=OTHER&count=1&projection=(id,firstName,lastName,profilePicture(displayImage~:playableStreams))`;
 
-  // Make a request to the API endpoint using an access token
-  fetch(apiUrl, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      // Get the user information from the API response
-      const user = data.elements[0];
+//   // Make a request to the API endpoint using an access token
+//   fetch(apiUrl, {
+//     headers: {
+//       Authorization: `Bearer ${accessToken}`,
+//       'Content-Type': 'application/json',
+//     },
+//   })
+//     .then((response) => response.json())
+//     .then((data) => {
+//       // Get the user information from the API response
+//       const user = data.elements[0];
 
-      // Log the user information to the console
-      console.log(user.id);
-      console.log(user.firstName);
-      console.log(user.lastName);
-      console.log(
-        user.profilePicture['displayImage~'].elements[0].identifiers[0]
-          .identifier
-      );
-    })
-    .catch((error) => {
-      // Log any errors to the console
-      console.error(error);
-    });
+//       // Log the user information to the console
+//       console.log(user.id);
+//       console.log(user.firstName);
+//       console.log(user.lastName);
+//       console.log(
+//         user.profilePicture['displayImage~'].elements[0].identifiers[0]
+//           .identifier
+//       );
+//     })
+//     .catch((error) => {
+//       // Log any errors to the console
+//       console.error(error);
+//     });
+// }
+
+function getUserName() {
+  const userName = document.querySelector(
+    '.pv-text-details__left-panel > div > h1'
+  );
+  return userName.innerText;
 }
 
 // Create the modal HTML
@@ -143,6 +148,8 @@ const nameInput = document.createElement('input');
 nameInput.type = 'text';
 nameInput.id = 'name';
 nameInput.name = 'name';
+nameInput.value = getUserName();
+
 form.appendChild(nameInput);
 
 const emailLabel = document.createElement('label');
@@ -240,7 +247,6 @@ function saveForm(e) {
 }
 
 const addItem = ({ name, url, company, email }) => {
-  console.log(name, url, company, email);
   fetch('http://localhost:3000/graphql', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -262,12 +268,10 @@ const addItem = ({ name, url, company, email }) => {
         }
       `,
     }),
-  })
-    .then((_) => {
-      showSnackBar();
-      closeModal();
-    })
-    .then((data) => console.log(data));
+  }).then((_) => {
+    showSnackBar();
+    closeModal();
+  });
 };
 
 console.log('Extension is working');
