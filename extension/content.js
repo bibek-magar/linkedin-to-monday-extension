@@ -188,6 +188,9 @@ urlInput.value = window.location.href;
 form.appendChild(urlInput);
 
 const saveBtn = document.createElement('button');
+saveBtn.style.marginTop = '20px';
+saveBtn.className =
+  'save-button artdeco-dropdown__trigger artdeco-dropdown__trigger--placement-bottom ember-view artdeco-button artdeco-button--2 artdeco-button--primary';
 saveBtn.type = 'button';
 saveBtn.innerHTML = 'Save';
 saveBtn.addEventListener('click', saveForm);
