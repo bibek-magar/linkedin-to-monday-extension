@@ -1,6 +1,6 @@
 const mondaySdk = require('monday-sdk-js');
 const { v1: uuidv1 } = require('uuid');
-const { mondayAPIKey, groupID, boardID } = require('../config');
+const { mondayAPIKey, groupID, boardID } = require('../../config');
 
 const token = mondayAPIKey;
 const NAME_COLUMN_ID = 'text35';

@@ -4,22 +4,12 @@ const mondaySDK = require('monday-sdk-js');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const userRepository = require('./repository/saveUserInfo');
+const userRepository = require('./src/repository/saveUserInfo');
 
-const {
-  GraphQLSchema,
-  GraphQLObjectType,
-  GraphQLString,
-  GraphQLID,
-} = require('graphql');
-const { port } = require('./config');
-const { UserModel } = require('./models');
-const schema = require('./schema/schema');
+const { port, mondayAPIKey, mongoURL } = require('./config');
+const { UserModel } = require('./src/models');
+const schema = require('./src/schema/schema');
 
-const mongoConnectionString =
-  'mongodb+srv://beevekmgr:test1234@cluster0.qyywtxu.mongodb.net/?retryWrites=true&w=majority';
-const MONDAY_API_KEY =
-  'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjI0NjkyNTYwOSwidWlkIjo0MTM4MDIyOSwiaWFkIjoiMjAyMy0wMy0yNVQxNDowODozNi4zNTRaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTYyMDE5NDEsInJnbiI6InVzZTEifQ.b1cPBfc1kr99_CYaDXEieoIeJeBSymmKdZRgyTa8U1Q';
 const monday = mondaySDK();
 
 const NAME_COLUMN_ID = 'text35';
@@ -27,7 +17,7 @@ const EMAIL_COLUMN_ID = 'text3';
 const COMPANY_COLUMN_ID = 'dup__of_url';
 const URL_COLUMN_ID = 'text0';
 
-monday.setToken(MONDAY_API_KEY);
+monday.setToken(mondayAPIKey);
 
 const app = express();
 
@@ -98,7 +88,7 @@ app.post('/monday-webhook', (req, res) => {
 main().catch((err) => console.log(err));
 
 async function main() {
-  await mongoose.connect(mongoConnectionString, {
+  await mongoose.connect(mongoURL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });

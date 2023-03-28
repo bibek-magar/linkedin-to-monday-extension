@@ -1,5 +1,5 @@
 const express = require('express');
-const { saveDataToMongo } = require('../models/user');
+const { saveDataToMongo } = require('../src/models/user');
 
 const router = express.Router();
 
