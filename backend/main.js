@@ -1,7 +1,6 @@
 const express = require('express');
 const { graphqlHTTP } = require('express-graphql');
 const mondaySDK = require('monday-sdk-js');
-const { v1: uuidv1 } = require('uuid');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
