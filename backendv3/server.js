@@ -2,6 +2,10 @@ const express = require('express');
 const { graphqlHTTP } = require('express-graphql');
 const mondaySDK = require('monday-sdk-js');
 const { v1: uuidv1 } = require('uuid');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+
 const {
   GraphQLSchema,
   GraphQLObjectType,
@@ -9,14 +13,22 @@ const {
   GraphQLID,
 } = require('graphql');
 
-const monday = mondaySDK();
-
+const mongoConnectionString =
+  'mongodb+srv://beevekmgr:test1234@cluster0.qyywtxu.mongodb.net/?retryWrites=true&w=majority';
 const MONDAY_API_KEY =
   'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjI0NjkyNTYwOSwidWlkIjo0MTM4MDIyOSwiaWFkIjoiMjAyMy0wMy0yNVQxNDowODozNi4zNTRaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTYyMDE5NDEsInJnbiI6InVzZTEifQ.b1cPBfc1kr99_CYaDXEieoIeJeBSymmKdZRgyTa8U1Q';
-monday.setToken(MONDAY_API_KEY);
+const monday = mondaySDK();
 
+const NAME_COLUMN_ID = 'text35';
+const EMAIL_COLUMN_ID = 'text3';
+const COMPANY_COLUMN_ID = 'dup__of_url';
+const URL_COLUMN_ID = 'text0';
+
+monday.setToken(MONDAY_API_KEY);
 const BOARD_ID = 4189447431;
 const GROUP_ID = 'new_group37570';
+const COLUMN_ID = 4202038482;
+
 const ITEM_NAME = uuidv1();
 
 const ItemType = new GraphQLObjectType({
@@ -52,14 +64,14 @@ const schema = new GraphQLSchema({
           company: { type: GraphQLString },
           email: { type: GraphQLString },
         },
-        resolve: async (parent, args) => {
+        resolve: async (_, args) => {
           const { name, url, company, email } = args;
 
           const columnValues = {
-            text35: name,
-            text3: email,
-            dup__of_url: company,
-            text0: url,
+            [NAME_COLUMN_ID]: name,
+            [EMAIL_COLUMN_ID]: email,
+            [COMPANY_COLUMN_ID]: company,
+            [URL_COLUMN_ID]: url,
           };
 
           const res = await monday.api(`
@@ -84,21 +96,10 @@ const schema = new GraphQLSchema({
           }
            `);
 
-          console.log(res.data);
           const { id, column_values } = res.data.create_item;
           const createdItem = {
             id,
             name,
-            // name: column_values.find((c) => c.id === '<YOUR_URL_COLUMN_ID>')
-            //   .value,
-
-            // url: column_values.find((c) => c.id === '<YOUR_URL_COLUMN_ID>')
-            //   .value,
-            // company: column_values.find(
-            //   (c) => c.id === '<YOUR_COMPANY_COLUMN_ID>'
-            // ).value,
-            // email: column_values.find((c) => c.id === '<YOUR_EMAIL_COLUMN_ID>')
-            //   .value,
           };
           return createdItem;
         },
@@ -133,6 +134,98 @@ app.use(
   })
 );
 
-app.listen(3000, () => {
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(cors());
+
+main().catch((err) => console.log(err));
+
+async function main() {
+  await mongoose.connect(mongoConnectionString, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+}
+
+const UserSchema = mongoose.Schema;
+
+const userSchema = new UserSchema({
+  name: String,
+  url: String,
+  company: String,
+  email: String,
+});
+
+const MyModel = mongoose.model('LinkedInData', userSchema);
+
+function saveDataToMongo(data) {
+  const { name, url, company, email } = data;
+  const newData = new MyModel({ name, url, company, email });
+  newData
+    .save()
+    .then(() => {
+      console.log('Document saved successfully');
+    })
+    .catch((error) => {
+      console.log(`Error saving document: ${error}`);
+    });
+}
+
+app.post('/data', (req, res) => {
+  const { name, url, company, email } = req.body;
+  const data = new MyModel({ name, url, company, email });
+  data
+    .save()
+    .then(() => {
+      res.status(200).send('Document saved successfully');
+    })
+    .catch((error) => {
+      res.status(500).send(`Error saving document: ${error}`);
+    });
+});
+
+// Define your schema and model
+const MondaySchema = mongoose.Schema;
+
+const mondaySchema = new MondaySchema({
+  boardId: Number,
+  itemId: Number,
+  columnId: Number,
+  value: String,
+});
+
+app.post('/monday-webhook', (req, res) => {
+  const { challenge } = req.body;
+
+  // If a challenge parameter is present, return the challenge value in the response body
+  if (challenge) {
+    res.status(200).send(req.body);
+  } else {
+    // Process the webhook data and update your database or perform any other actions required
+    const { event, payload } = req.body;
+
+    console.log(event);
+    console.log(
+      `Received ${event.columnValues[EMAIL_COLUMN_ID].value} event from Monday.com with payload:`,
+      payload
+    );
+
+    const result = {
+      name: event.columnValues[NAME_COLUMN_ID].value ?? '',
+      email: event.columnValues[EMAIL_COLUMN_ID].value ?? '',
+      company: event.columnValues[COMPANY_COLUMN_ID].value ?? '',
+      url: event.columnValues[URL_COLUMN_ID].value ?? '',
+    };
+
+    saveDataToMongo(result);
+    // Send a 200 OK status code back to confirm receipt of the data
+    res.sendStatus(200);
+  }
+});
+
+// Start the server
+const port = 3000;
+
+app.listen(port, () => {
   console.log('Server started on port 3000');
 });
