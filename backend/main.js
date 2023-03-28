@@ -108,8 +108,6 @@ app.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });
 
-console.log('Monday', monday);
-
 module.exports = {
   mondayServer: monday.api,
 };
