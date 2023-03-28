@@ -1,0 +1,53 @@
+
+mutation {
+  create_item(board_id: 4189447431, group_id: new_group37570, item_name: "Test item", column_values: "{\"dup__of_url\":\"META\",\"text35\":\"Bibek\",\"text3\":\"RAM@gmail.com\",\"text0\":\"bibek.alemagar.com.np\"}") {
+    id
+    name
+    column_values {
+      id
+      title
+      value
+    }
+  }
+}
+
+// // const COLUMN_VALUES = 
+// {
+//     "data": {
+//         "create_item": {
+//             "id": "4202038482",
+//             "name": "Seeesh",
+//             "column_values": [
+//                 {
+//                     "id": "subitems",
+//                     "title": "Subitems",
+//                     "value": null
+//                 },
+//                 {
+//                     "id": "text3",
+//                     "title": "Email",
+//                     "value": null
+//                 },
+//                 {
+//                     "id": "dup__of_url",
+//                     "title": "Company",
+//                     "value": null
+//                 },
+//                 {
+//                     "id": "text0",
+//                     "title": "URL",
+//                     "value": null
+//                 },
+//                 {
+//                     "id": "text35",
+//                     "title": "Name",
+//                     "value": null
+//                 }
+//             ]
+//         }
+//     },
+//     "account_id": 16201941
+// }
+
+
+
