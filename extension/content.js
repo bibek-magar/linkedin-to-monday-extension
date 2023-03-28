@@ -1,5 +1,4 @@
 const graphqlURL = 'http://localhost:3000/graphql';
-const BOARD_ID = '4189447431';
 
 loadButton();
 
@@ -250,7 +249,7 @@ function saveForm(e) {
 }
 
 const addItem = ({ name, url, company, email }) => {
-  fetch('http://localhost:3000/graphql', {
+  fetch(graphqlURL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
